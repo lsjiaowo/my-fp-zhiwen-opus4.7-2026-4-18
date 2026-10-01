@@ -141,7 +141,7 @@ export default function LoginPage() {
               value={serverUrl}
               onChange={(e) => setServerUrlState(e.target.value)}
               addonBefore={<CloudServerOutlined />}
-              placeholder="http://host:port"
+              placeholder="https://your-domain.example"
             />
           </Form.Item>
           <Space>
