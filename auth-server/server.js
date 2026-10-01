@@ -6,12 +6,12 @@ const path = require('path');
 const { spawn } = require('child_process');
 const net = require('net');
 
-const DATA_DIR = '/opt/fp-browser-auth';
+const DATA_DIR = '/opt/my-fp-zhiwen-personal/data';
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const SINGBOX_BIN = '/usr/local/bin/sing-box';
-const RELAY_DIR = path.join(DATA_DIR, 'relays');
-const SYNC_DIR = path.join(DATA_DIR, 'sync-data');
+const RELAY_DIR = '/opt/my-fp-zhiwen-personal/relays';
+const SYNC_DIR = '/opt/my-fp-zhiwen-personal/sync-data';
 const PORT = 3000;
 
 // 2026-04-19: cloud sync limits — keep these in lockstep with shared/syncTypes.ts
@@ -938,9 +938,9 @@ const server = http.createServer(async (req, res) => {
 
   // ========== Cloud Sync API (requires valid token) ==========
   // Layout on disk:
-  //   /opt/fp-browser-auth/sync-data/<username>/snapshot.json
-  //   /opt/fp-browser-auth/sync-data/<username>/manifests/<profileId>.json
-  //   /opt/fp-browser-auth/sync-data/<username>/blobs/<sha256[:2]>/<sha256>
+  //   /opt/my-fp-zhiwen-personal/sync-data/<username>/snapshot.json
+  //   /opt/my-fp-zhiwen-personal/sync-data/<username>/manifests/<profileId>.json
+  //   /opt/my-fp-zhiwen-personal/sync-data/<username>/blobs/<sha256[:2]>/<sha256>
   //
   // Content-addressed blobs let us dedup identical files (e.g. same `Local
   // State` across many profiles) without bookkeeping. Garbage collection
