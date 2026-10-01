@@ -1,5 +1,5 @@
 /**
- * Client for the remote auth server (146.190.45.66:3000 by default).
+ * Client for the Personal Self-Hosted auth/sync server.
  *
  * Token + server URL persist in localStorage so they survive Electron restarts.
  * Heartbeat is fired every HEARTBEAT_INTERVAL_MS to detect server-side disable
@@ -17,7 +17,7 @@ const STORAGE_TOKEN = 'fp.auth.token';
 const STORAGE_USER = 'fp.auth.user';
 const STORAGE_SERVER = 'fp.auth.server';
 
-const DEFAULT_SERVER = 'http://146.190.45.66:3000';
+const DEFAULT_SERVER = 'http://23.246.164.95:3000';
 
 export interface AuthUser {
   username: string;
