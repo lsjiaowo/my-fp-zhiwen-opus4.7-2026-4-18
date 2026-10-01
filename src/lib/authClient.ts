@@ -17,7 +17,7 @@ const STORAGE_TOKEN = 'fp.auth.token';
 const STORAGE_USER = 'fp.auth.user';
 const STORAGE_SERVER = 'fp.auth.server';
 
-const DEFAULT_SERVER = 'http://23.246.164.95:3000';
+const DEFAULT_SERVER = 'https://fp-zhiwen.nicegood.de5.net';
 
 export interface AuthUser {
   username: string;
