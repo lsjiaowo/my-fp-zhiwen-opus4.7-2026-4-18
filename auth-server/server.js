@@ -843,10 +843,10 @@ const server = http.createServer(async (req, res) => {
     if (!/^[a-zA-Z0-9_\-]+$/.test(username)) return json(res, 400, { error: '用户名只能包含字母数字下划线' });
     const users = loadUsers();
     if (users.find(u => u.username === username)) return json(res, 409, { error: '用户名已存在' });
-    // 2026-04-18: new accounts default to disabled — admin must approve via /admin
-    users.push({ username, password: hashPwd(password), role: 'user', enabled: false, createdAt: Date.now() });
+    // Personal Self-Hosted Edition: accounts are active immediately.
+    users.push({ username, password: hashPwd(password), role: 'user', enabled: true, createdAt: Date.now() });
     saveUsers(users);
-    return json(res, 200, { message: '注册成功，请等待管理员审核激活', pending: true });
+    return json(res, 200, { message: '注册成功，请登录', pending: false });
   }
 
   if (url === '/api/verify' && req.method === 'POST') {
