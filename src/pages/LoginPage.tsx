@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { Card, Form, Input, Button, Tabs, Alert, Space, Typography, Modal, Tooltip } from 'antd';
+import { Card, Form, Input, Button, Alert, Space, Typography, Modal, Tooltip } from 'antd';
 import {
-  UserOutlined, LockOutlined, LoginOutlined, UserAddOutlined,
+  UserOutlined, LockOutlined, LoginOutlined,
   CloudServerOutlined, SettingOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../lib/authContext';
 import { getServerUrl, setServerUrl, ping, AuthError } from '../lib/authClient';
 
-type Tab = 'login' | 'register';
 
 export default function LoginPage() {
-  const { login, register, state } = useAuth();
-  const [tab, setTab] = useState<Tab>('login');
+  const { login, state } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -35,29 +33,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleRegister = async (values: { username: string; password: string; password2: string }) => {
-    if (values.password !== values.password2) {
-      setError('两次密码不一致');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setSuccess(null);
-    try {
-      const r = await register(values.username.trim(), values.password);
-      if (r.pending) {
-        setSuccess(r.message || '注册成功，请登录');
-        setTab('login');
-      } else {
-        setSuccess(r.message || '注册成功，请登录');
-        setTab('login');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '注册失败');
-    } finally {
-      setBusy(false);
-    }
-  };
 
   const handlePing = async () => {
     setPingResult(null);
@@ -114,62 +89,23 @@ export default function LoginPage() {
           <Alert type="success" showIcon message={success} style={{ marginBottom: 12 }} closable onClose={() => setSuccess(null)} />
         )}
 
-        <Tabs
-          activeKey={tab}
-          onChange={(k) => { setTab(k as Tab); setError(null); setSuccess(null); }}
-          items={[
-            {
-              key: 'login',
-              label: <span><LoginOutlined /> 登录</span>,
-              children: (
-                <Form layout="vertical" onFinish={handleLogin} requiredMark={false} disabled={busy}>
-                  <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
-                    <Input prefix={<UserOutlined />} placeholder="用户名" size="large" autoComplete="username" />
-                  </Form.Item>
-                  <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-                    <Input.Password prefix={<LockOutlined />} placeholder="密码" size="large" autoComplete="current-password" />
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit" block size="large" loading={busy} icon={<LoginOutlined />}>
-                    登录
-                  </Button>
-                </Form>
-              ),
-            },
-            {
-              key: 'register',
-              label: <span><UserAddOutlined /> 注册</span>,
-              children: (
-                <Form layout="vertical" onFinish={handleRegister} requiredMark={false} disabled={busy}>
-                  <Form.Item
-                    name="username"
-                    rules={[
-                      { required: true, message: '请输入用户名' },
-                      { min: 2, max: 30, message: '用户名长度 2-30 位' },
-                      { pattern: /^[a-zA-Z0-9_-]+$/, message: '只能包含字母、数字、下划线、横线' },
-                    ]}
-                  >
-                    <Input prefix={<UserOutlined />} placeholder="用户名" size="large" />
-                  </Form.Item>
-                  <Form.Item name="password" rules={[{ required: true, min: 4, message: '密码至少 4 位' }]}>
-                    <Input.Password prefix={<LockOutlined />} placeholder="密码（至少 4 位）" size="large" />
-                  </Form.Item>
-                  <Form.Item name="password2" rules={[{ required: true, message: '请再次输入密码' }]}>
-                    <Input.Password prefix={<LockOutlined />} placeholder="再次输入密码" size="large" />
-                  </Form.Item>
-                  <Alert
-                    type="info"
-                    showIcon
-                    message="注册后需要管理员在后台审核激活，激活后方可登录"
-                    style={{ marginBottom: 12 }}
-                  />
-                  <Button type="primary" htmlType="submit" block size="large" loading={busy} icon={<UserAddOutlined />}>
-                    创建账号
-                  </Button>
-                </Form>
-              ),
-            },
-          ]}
-        />
+        <Form layout="vertical" onFinish={handleLogin} requiredMark={false} disabled={busy}>
+          <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
+            <Input prefix={<UserOutlined />} placeholder="用户名" size="large" autoComplete="username" />
+          </Form.Item>
+          <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
+            <Input.Password prefix={<LockOutlined />} placeholder="密码" size="large" autoComplete="current-password" />
+          </Form.Item>
+          <Button type="primary" htmlType="submit" block size="large" loading={busy} icon={<LoginOutlined />}>
+            登录
+          </Button>
+          <Alert
+            type="info"
+            showIcon
+            message="Personal Self-Hosted 个人版仅使用已创建的唯一账号登录；客户端不开放注册。"
+            style={{ marginTop: 12 }}
+          />
+        </Form>
 
         <div className="login-footer">
           <Space split={<span style={{ color: 'rgba(255,255,255,0.15)' }}>|</span>}>
