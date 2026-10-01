@@ -82,13 +82,7 @@ function getSessionUser(req) {
 
 ensureFiles();
 
-// Ensure admin exists
-const users = loadUsers();
-const hasAdmin = users.find(u => u.username === 'sunchao');
-if (!hasAdmin) {
-  users.push({ username: 'sunchao', password: hashPwd('sunchao250'), role: 'admin', enabled: true, createdAt: Date.now() });
-  saveUsers(users);
-}
+// Personal Self-Hosted Edition: no bundled administrator account is created.
 
 // --- Relay Management (lightweight built-in SOCKS5 chain) ---
 fs.mkdirSync(RELAY_DIR, { recursive: true });
