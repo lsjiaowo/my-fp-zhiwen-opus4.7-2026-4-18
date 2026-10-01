@@ -46,7 +46,7 @@ export default function LoginPage() {
     try {
       const r = await register(values.username.trim(), values.password);
       if (r.pending) {
-        setSuccess(r.message || '注册成功，等待管理员审核激活后方可登录');
+        setSuccess(r.message || '注册成功，请登录');
         setTab('login');
       } else {
         setSuccess(r.message || '注册成功，请登录');
@@ -200,7 +200,7 @@ export default function LoginPage() {
         cancelText="取消"
       >
         <Form layout="vertical">
-          <Form.Item label="服务器地址" extra="例如 http://146.190.45.66:3000，不需要尾部斜杠">
+          <Form.Item label="服务器地址" extra="填写你的 Personal Self-Hosted 服务器地址，不需要尾部斜杠">
             <Input
               value={serverUrl}
               onChange={(e) => setServerUrlState(e.target.value)}
@@ -210,7 +210,7 @@ export default function LoginPage() {
           </Form.Item>
           <Space>
             <Button onClick={handlePing}>测试连接</Button>
-            <Button onClick={() => setServerUrlState('http://146.190.45.66:3000')}>恢复默认</Button>
+            <Button onClick={() => setServerUrlState(getServerUrl())}>恢复当前</Button>
           </Space>
           {pingResult && (
             <Alert
