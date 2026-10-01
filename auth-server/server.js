@@ -7,6 +7,7 @@ const { spawn } = require('child_process');
 const net = require('net');
 
 const DATA_DIR = process.env.FP_DATA_DIR || '/opt/my-fp-zhiwen-personal/data';
+const REGISTRATION_SECRET = process.env.FP_REGISTRATION_SECRET || '';
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const SINGBOX_BIN = '/usr/local/bin/sing-box';
@@ -829,7 +830,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (url === '/api/register' && req.method === 'POST') {
-    const { username, password } = await parseBody(req);
+    const { username, password, registrationSecret } = await parseBody(req);
+    if (!REGISTRATION_SECRET) return json(res, 503, { error: '服务器尚未配置首次注册密钥', code: 'REGISTRATION_NOT_CONFIGURED' });
+    const suppliedSecret = typeof registrationSecret === 'string' ? registrationSecret : '';
+    const expectedSecret = Buffer.from(REGISTRATION_SECRET);
+    const actualSecret = Buffer.from(suppliedSecret);
+    if (expectedSecret.length !== actualSecret.length || !crypto.timingSafeEqual(expectedSecret, actualSecret)) {
+      return json(res, 403, { error: '注册密钥无效', code: 'INVALID_REGISTRATION_SECRET' });
+    }
     if (!username || !password) return json(res, 400, { error: '请填写用户名和密码' });
     if (username.length < 2 || username.length > 30) return json(res, 400, { error: '用户名长度 2-30 位' });
     if (password.length < 4) return json(res, 400, { error: '密码至少 4 位' });
