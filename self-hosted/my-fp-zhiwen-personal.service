@@ -6,7 +6,7 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/my-fp-zhiwen-personal/app/auth-server
-ExecStart=/usr/bin/node /opt/my-fp-zhiwen-personal/app/auth-server/server.js
+ExecStart=/usr/bin/node /opt/my-fp-zhiwen-personal/app/auth-server/server.cjs
 Environment=NODE_ENV=production
 Environment=FP_DATA_DIR=/opt/my-fp-zhiwen-personal/data
 Restart=on-failure
