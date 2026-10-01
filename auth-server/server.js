@@ -25,9 +25,8 @@ const activeRelays = new Map();
 function ensureFiles() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify([
-      { username: 'sunchao', password: hashPwd('sunchao250'), role: 'admin', enabled: true, createdAt: Date.now() }
-    ], null, 2));
+    // Personal Self-Hosted Edition starts with no bundled accounts.
+    fs.writeFileSync(USERS_FILE, '[]');
   }
   if (!fs.existsSync(SESSIONS_FILE)) fs.writeFileSync(SESSIONS_FILE, '[]');
 }
