@@ -3,6 +3,8 @@ name: Personal Windows Build
 on:
   push:
     branches: [personal-self-hosted]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
