@@ -74,6 +74,13 @@ function normalizeFingerprint(fp: Partial<FingerprintConfig>): FingerprintConfig
     if (ua.includes('windows') || ua.includes('mac os x')) { fp.navigator = undefined; }
   }
 
+  // Desktop profiles must not retain stale tablet/mobile metadata from an
+  // earlier device switch. That stale branch made the list show "平板" and
+  // allowed mobile identity hints to leak into an otherwise desktop profile.
+  if ((os === 'windows' || os === 'mac' || os === 'linux') && (fp as FingerprintConfig).device === 'desktop') {
+    (fp as FingerprintConfig).mobile = undefined;
+  }
+
   // Mobile self-heal: if OS is iOS/Android but `device` / `mobile` fields are
   // absent (legacy profile or partial edit), derive sane defaults so the
   // launcher can apply Playwright mobile emulation correctly.
