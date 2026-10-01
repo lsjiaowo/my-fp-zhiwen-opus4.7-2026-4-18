@@ -6,7 +6,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const net = require('net');
 
-const DATA_DIR = '/opt/fp-browser-auth';
+const DATA_DIR = process.env.FP_DATA_DIR || '/opt/my-fp-zhiwen-personal/data';
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const SINGBOX_BIN = '/usr/local/bin/sing-box';
