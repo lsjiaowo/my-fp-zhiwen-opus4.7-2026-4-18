@@ -835,8 +835,12 @@ const server = http.createServer(async (req, res) => {
     if (password.length < 4) return json(res, 400, { error: '密码至少 4 位' });
     if (!/^[a-zA-Z0-9_\-]+$/.test(username)) return json(res, 400, { error: '用户名只能包含字母数字下划线' });
     const users = loadUsers();
-    if (users.find(u => u.username === username)) return json(res, 409, { error: '用户名已存在' });
-    // Personal Self-Hosted Edition: new accounts are active immediately.
+    // Personal Self-Hosted Edition is single-owner by default: only the first
+    // account can be registered. The same owner account can be used on PCs A/B.
+    if (users.length > 0) {
+      return json(res, 403, { error: '个人版已完成首次账号注册，请使用已有账号登录', code: 'REGISTRATION_CLOSED' });
+    }
+    // The first account is active immediately; no remote administrator approval.
     users.push({ username, password: hashPwd(password), role: 'user', enabled: true, createdAt: Date.now() });
     saveUsers(users);
     return json(res, 200, { message: '注册成功，请登录', pending: false });
