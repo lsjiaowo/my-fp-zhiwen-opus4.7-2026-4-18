@@ -45,6 +45,16 @@ function normalizeFingerprint(fp: Partial<FingerprintConfig>): FingerprintConfig
   // sub-trees as missing so they get re-filled from a matching preset.
   const os = (fp as FingerprintConfig).os;
   const renderer = (fp.webgl?.renderer ?? '').toLowerCase();
+  // v0.5.0 ships Chromium 146. Legacy desktop presets were accidentally left
+  // on Chrome/145. Upgrade only that known stale desktop UA in-place so existing
+  // profiles (such as Test-01) stay on the same OS/GPU/screen/seed while their
+  // HTTP/JS UA matches the bundled Chromium/TLS generation.
+  if ((os === 'windows' || os === 'mac' || os === 'linux') && fp.navigator?.userAgent?.includes('Chrome/145.0.0.0')) {
+    fp.navigator = {
+      ...fp.navigator,
+      userAgent: fp.navigator.userAgent.replace('Chrome/145.0.0.0', 'Chrome/146.0.7680.177'),
+    };
+  }
   const ua = (fp.navigator?.userAgent ?? '').toLowerCase();
   const platform = (fp.navigator?.platform ?? '').toLowerCase();
   if (os === 'windows') {
