@@ -350,6 +350,20 @@ export default function ProfileEditor() {
       // the COMPLETE internal store, including initial values set via
       // setFieldsValue() that were never mounted.
       const values = form.getFieldsValue(true) as FormValues;
+
+      // Device picker is a derived Segmented control rather than a registered
+      // Form.Item. Persist the category that is actually shown to the user and
+      // strip stale mobile metadata when saving a desktop profile. Without this,
+      // an old tablet/mobile branch can survive an edit and the profile list /
+      // launcher will continue treating the profile as a tablet.
+      if (values.fingerprint) {
+        values.fingerprint = {
+          ...values.fingerprint,
+          device: currentCategory,
+          ...(currentCategory === 'desktop' ? { mobile: undefined } : {}),
+        };
+      }
+
       const tags = values.tags
         ? String(values.tags).split(/[,，]/).map((s) => s.trim()).filter(Boolean)
         : [];
