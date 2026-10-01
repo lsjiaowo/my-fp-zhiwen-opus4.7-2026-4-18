@@ -47,28 +47,35 @@ function computeRealMobileWindowSize(spoofedW: number, spoofedH: number): { w: n
   };
 }
 
-function computeRealWindowSize(spoofedW: number, spoofedH: number): { w: number; h: number } {
+function computeRealWindowBounds(spoofedW: number, spoofedH: number): { w: number; h: number; x: number; y: number } {
+  let workX = 0;
+  let workY = 0;
   let workW = spoofedW;
   let workH = spoofedH;
   try {
     const primary = screen.getPrimaryDisplay();
-    workW = primary.workAreaSize.width;
-    workH = primary.workAreaSize.height;
+    workX = primary.workArea.x;
+    workY = primary.workArea.y;
+    workW = primary.workArea.width;
+    workH = primary.workArea.height;
   } catch {
     // app may not be ready yet during early init — fall back to spoof
   }
   const maxW = Math.floor(workW * 0.95);
   const maxH = Math.floor(workH * 0.95);
-  if (spoofedW <= maxW && spoofedH <= maxH) {
-    // Spoofed size fits perfectly — use it.
-    return { w: spoofedW, h: spoofedH };
+  let w = spoofedW;
+  let h = spoofedH;
+  if (spoofedW > maxW || spoofedH > maxH) {
+    const ratio = Math.min(maxW / spoofedW, maxH / spoofedH);
+    w = Math.max(1024, Math.floor(spoofedW * ratio));
+    h = Math.max(720, Math.floor(spoofedH * ratio));
   }
-  // Scale down preserving the spoofed aspect ratio.
-  const ratio = Math.min(maxW / spoofedW, maxH / spoofedH);
-  return {
-    w: Math.max(1024, Math.floor(spoofedW * ratio)),
-    h: Math.max(720, Math.floor(spoofedH * ratio)),
-  };
+  // Center the native Chromium window in the primary display work area.
+  // Do not force (0,0): that looks off-centre on large/ultrawide monitors and
+  // is wrong when the Windows taskbar changes the work-area origin.
+  const x = workX + Math.max(0, Math.floor((workW - w) / 2));
+  const y = workY + Math.max(0, Math.floor((workH - h) / 2));
+  return { w, h, x, y };
 }
 
 export interface ConsistencyIssue {
@@ -289,8 +296,8 @@ export function buildLaunchOptions(
   // phone (similar to BitBrowser's mobile preview).
   const isMobile = fp.device === 'mobile' || fp.device === 'tablet' || fp.os === 'ios' || fp.os === 'android';
   const realWin = isMobile
-    ? computeRealMobileWindowSize(fp.screen.width, fp.screen.height)
-    : computeRealWindowSize(fp.screen.width, fp.screen.height);
+    ? { ...computeRealMobileWindowSize(fp.screen.width, fp.screen.height), x: 0, y: 0 }
+    : computeRealWindowBounds(fp.screen.width, fp.screen.height);
 
   // CloakBrowser auto-derives hardware/screen/GPU from seed when not specified;
   // we only override what the user explicitly customized in the preset so that
@@ -311,7 +318,7 @@ export function buildLaunchOptions(
     `--fingerprint-storage-quota=${fp.storageQuotaMB}`,
     // REAL window size — clamped to the user's monitor so it fits on screen.
     `--window-size=${realWin.w},${realWin.h}`,
-    `--window-position=0,0`,
+    `--window-position=${realWin.x},${realWin.y}`,
     // Defense-in-depth (most of these are also handled by cloakbrowser's
     // C++ patches, but explicit redundancy doesn't hurt and helps if a
     // future binary version regresses).
